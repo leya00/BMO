@@ -1,6 +1,6 @@
 import datetime
 import requests
-
+ 
 def get_current_time():
     now = datetime.datetime.now()
     return now.strftime("%I:%M %p")
