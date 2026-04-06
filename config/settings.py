@@ -1,1 +1,2 @@
-ANTHROPIC_API_KEY = "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"
+import os
+ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
