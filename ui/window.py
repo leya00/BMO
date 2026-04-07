@@ -2,6 +2,8 @@ import tkinter as tk
 import threading
 from ui.face import BMOSprite
 from config import settings
+import pystray
+from PIL import Image, ImageTk
 
 class BMOWindow:
     def __init__(self, root: tk.Tk):
@@ -17,6 +19,14 @@ class BMOWindow:
         self.bmo_sprite = BMOSprite(self.bmo_canvas)
         self.animate()
 
+        self._set_position()
+
     def animate(self):
         self.bmo_sprite.animate()
         self.root.after(200, self.animate)
+
+    def _set_position(self):
+        sh = self.root.winfo_screenheight()
+        x = 10
+        y = sh - settings.WINDOW_HEIGHT - 18  
+        self.root.geometry(f"+{x}+{y}")
