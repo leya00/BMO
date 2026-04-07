@@ -3,7 +3,7 @@
 
 # API keys 
 .env
-
+ANTHROPIC_API_KEY="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"
 # Python cache
 __pycache__/
 *.pyc
