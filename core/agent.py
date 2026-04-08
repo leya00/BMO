@@ -1,11 +1,14 @@
 import os
 import json
-import anthropic
-from config.settings import ANTHROPIC_API_KEY, BMO_SYSTEM_PROMPT, MEMORY_FILE, MAX_HISTORY_TURNS
+import ollama
+from dotenv import load_dotenv
+from config.settings import BMO_SYSTEM_PROMPT, MEMORY_FILE, MAX_HISTORY_TURNS
+
+
+load_dotenv()
 
 class BMOAgent:
     def __init__(self):
-        self.client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
         self.history = self._load_history()
 
     def _load_history(self):
@@ -22,13 +25,11 @@ class BMOAgent:
     def chat(self, user_message: str) -> str:
         self.history.append({"role": "user", "content": user_message})
         
-        response = self.client.messages.create(
-            model="claude-3-5-sonnet-20240620", 
-            max_tokens=200,
-            system=BMO_SYSTEM_PROMPT,
-            messages=self.history[-MAX_HISTORY_TURNS:]
+        response = ollama.chat(
+            model="llama3.2",
+            messages=[{"role": "system", "content": BMO_SYSTEM_PROMPT}] + self.history[-MAX_HISTORY_TURNS:]
         )
-        reply = response.content[0].text if hasattr(response.content[0], 'text') else str(response.content[0])
+        reply = response['message']['content']
         
         self.history.append({"role": "assistant", "content": reply})
         self._save_history()

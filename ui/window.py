@@ -1,5 +1,7 @@
 import sys
 import os
+
+from ui.chat_bubble import ChatInput
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import tkinter as tk
@@ -9,6 +11,7 @@ from config import settings
 import pystray
 from PIL import Image, ImageTk
 from core.agent import BMOAgent
+from ui.chat_bubble import ChatInput
 
 class BMOWindow:
     def __init__(self, root: tk.Tk):
@@ -41,4 +44,25 @@ class BMOWindow:
         self.root.geometry(f"+{x}+{y}")
 
     def on_click(self, event):
-        print("BMO clicked!")
+        x = self.root.winfo_x()
+        y = self.root.winfo_y() - 80
+        ChatInput(self.root, x, y, self.handle_user_input)
+
+    def handle_user_input(self, message:str):
+        threading.Thread(target=self._ask_bmo, args=(message,), daemon=True).start()
+    
+    def _ask_bmo(self, message: str):
+        reply = self.agent.chat(message)
+        self.root.after(0, lambda: self._show_reply(reply))
+
+    def _show_reply(self, reply: str):
+        bubble = tk.Toplevel(self.root)
+        bubble.overrideredirect(True)
+        bubble.wm_attributes("-topmost", True)
+        bubble.geometry(f"+{self.root.winfo_x()}+{self.root.winfo_y() - 80}")
+
+        tk.Label(bubble, text=reply, font=("Arial", 10),
+                 bg="#b2e6dd", wraplength=200,
+                 padx=10, pady=8).pack()
+
+        bubble.after(8000, bubble.destroy)
