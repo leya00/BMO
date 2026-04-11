@@ -22,12 +22,13 @@ class BMOAgent:
         with open(MEMORY_FILE, "w") as f:
             json.dump(self.history, f, indent=4)
 
-    def chat(self, user_message: str) -> str:
+    def chat(self, user_message: str, user_name: str = "Friend") -> str:
+        system = BMO_SYSTEM_PROMPT.replace("{user_name}", user_name)
         self.history.append({"role": "user", "content": user_message})
         
         response = ollama.chat(
             model="llama3.2",
-            messages=[{"role": "system", "content": BMO_SYSTEM_PROMPT}] + self.history[-MAX_HISTORY_TURNS:]
+            messages=[{"role": "system", "content": system}] + self.history[-MAX_HISTORY_TURNS:]
         )
         reply = response['message']['content']
         
